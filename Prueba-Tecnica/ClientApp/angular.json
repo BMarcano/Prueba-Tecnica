@@ -129,5 +129,8 @@
       }
     }
   },
-  "defaultProject": "Prueba_Tecnica"
+  "defaultProject": "Prueba_Tecnica",
+  "cli": {
+    "analytics": "fb787277-0a28-4a47-b74c-e4697517878f"
+  }
 }
