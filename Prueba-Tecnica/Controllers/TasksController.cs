@@ -16,6 +16,10 @@ namespace Prueba_Tecnica.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<TaskModel>> GetTasks()
         {
+            if (tasks.Count == 0)
+            {
+                return BadRequest(new {message="Actualmente no hay tareas."});
+            }
             return tasks;
         }
 
