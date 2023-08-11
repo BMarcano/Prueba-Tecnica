@@ -2,6 +2,7 @@
 using TaskModel = Prueba_Tecnica.Models.Task;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Prueba_Tecnica.Controllers
 {
@@ -11,21 +12,22 @@ namespace Prueba_Tecnica.Controllers
     public class TasksController : ControllerBase
     {
         private static List<TaskModel> tasks = new List<TaskModel>();
-        private static int currentId = 1;
+        private static Guid currentId;
+
 
         [HttpGet]
         public ActionResult<IEnumerable<TaskModel>> GetTasks()
         {
             if (tasks.Count == 0)
             {
-                return BadRequest(new {message="Actualmente no hay tareas."});
+                return Ok(new { message = "Actualmente no hay tareas." });
             }
-            return tasks;
+            return Ok(tasks);
         }
 
         [HttpGet]
-        [Route("{id:int}")]
-        public ActionResult<TaskModel> GetTaskById(int id)
+        [Route("{id:guid}")]
+        public ActionResult<TaskModel> GetTaskById(Guid id)
         {
             var task = tasks.FirstOrDefault(t => t.Id == id);
 
@@ -40,7 +42,6 @@ namespace Prueba_Tecnica.Controllers
         [HttpPost]
         public ActionResult<TaskModel> CreateTask(TaskModel newTask)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -48,7 +49,7 @@ namespace Prueba_Tecnica.Controllers
 
             newTask.Description = newTask.Description.Trim();
             newTask.IsCompleted = false;
-            newTask.Id = currentId++;
+            newTask.Id = Guid.NewGuid();
             tasks.Add(newTask);
 
             return Ok(new { message = "Tarea creada con éxito.", task = newTask });

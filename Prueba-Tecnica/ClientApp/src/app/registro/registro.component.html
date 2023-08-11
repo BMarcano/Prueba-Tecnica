@@ -1,33 +1,32 @@
-<form class="form" [formGroup]="registroForm" (ngSubmit)="onSubmit()">
-  <div class="field">
-    <label class="label">Nombre</label>
-    <input type="text" class="input" formControlName="nombre" />
-    <span *ngIf="registroForm.get('nombre')?.invalid && (registroForm.get('nombre')?.dirty || registroForm.get('nombre')?.touched)"
-          class="error">{{ getErrorMessage('nombre') }}</span>
-  </div>
-  <div class="field">
-    <label class="label">Documento</label>
-    <input type="text" class="input" formControlName="documento" />
-    <span *ngIf="registroForm.get('documento')?.invalid && (registroForm.get('documento')?.dirty || registroForm.get('documento')?.touched)"
-          class="error">{{ getErrorMessage('documento') }}</span>
-  </div>
-  <div class="field">
-    <label class="label">Fecha de nacimiento</label>
-    <input type="date" class="input" formControlName="fechaNacimiento" />
-    <span *ngIf="registroForm.get('fechaNacimiento')?.invalid && (registroForm.get('fechaNacimiento')?.dirty || registroForm.get('fechaNacimiento')?.touched)"
-          class="error">{{ getErrorMessage('fechaNacimiento') }}</span>
-  </div>
-  <div class="field">
-    <label class="label">País:</label>
-    <select formControlName="pais">
-      <option value="" disabled selected>Selecciona un país</option>
-      <option value="Uruguay">Uruguay</option>
-      <option value="Venezuela">Venezuela</option>
-      <option value="Argentina">Argentina</option>
-      <option value="Chile">Chile</option>
-    </select>
-    <span *ngIf="registroForm.get('pais')?.invalid && (registroForm.get('pais')?.dirty || registroForm.get('pais')?.touched)"
-          class="error">{{ getErrorMessage('pais') }}</span>
-  </div>
-  <button type="submit" class="button">Registrar</button>
-</form>
+<div class="container">
+  <form class="form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label class="label">Nombre</label>
+      <input type="text" class="input" formControlName="name" />
+      <span *ngIf="isNombreInvalid()" class="error">{{ getErrorMessage('name') }}</span>
+    </div>
+
+    <div class="field">
+      <label class="label">Documento</label>
+      <input type="text" class="input" formControlName="document" (blur)="onBlur('document')" />
+      <span *ngIf="isDocumentoInvalid()" class="error">{{ getErrorMessage('document') }}</span>
+    </div>
+
+    <div class="field">
+      <label class="label">Fecha de nacimiento</label>
+      <input type="date" class="input" formControlName="birthDate" />
+      <span *ngIf="isFechaNacimientoInvalid()" class="error">{{ getErrorMessage('birthDate') }}</span>
+    </div>
+
+    <div class="field">
+      <label class="label">País:</label>
+      <select id="countries" formControlName="country">
+        <option value="" disabled selected>Selecciona un país</option>
+        <option *ngFor="let country of countries">{{ country.name.common }}</option>
+      </select>
+      <span *ngIf="isPaisInvalid()" class="error">{{ getErrorMessage('country') }}</span>
+    </div>
+
+    <button type="submit" class="button">Registrar</button>
+  </form>
+</div>

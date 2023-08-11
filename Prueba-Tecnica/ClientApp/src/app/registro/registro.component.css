@@ -5,6 +5,7 @@
   max-width: 450px;
   border-radius: 10px;
   box-shadow: rgba(3, 3, 3, 0.1) 10px 0px 50px;
+  
 }
 
 .field {
@@ -38,18 +39,20 @@
   cursor: pointer;
   padding: 25px 15px;
   font-size: 18px;
-  &:hover
+  border:2px;
+   &:hover
 {
   background: #0271da;
 }
 
 }
 
-.invalid {
-  border: 1px solid red;
-}
 
 .error {
   color: red;
 }
 
+.container{
+    display: flex;
+    justify-content: center;
+}

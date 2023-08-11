@@ -4,7 +4,7 @@ namespace Prueba_Tecnica.Models
 {
     public class Task
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "La descripción no puede exceder los 100 caracteres.")]

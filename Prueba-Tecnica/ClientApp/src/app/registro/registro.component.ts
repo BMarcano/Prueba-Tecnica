@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
+import { ApiService } from '../service/api.service';
 
 @Component({
   selector: 'app-registro',
@@ -7,19 +8,59 @@ import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/fo
   styleUrls: ['./registro.component.css']
 })
 export class RegistroComponent implements OnInit {
-  registroForm = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20), Validators.pattern('^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$')]],
-    documento: ['', [Validators.required, Validators.pattern('[0-9]{8}')]],
-    fechaNacimiento: ['', [Validators.required, mayorDeEdadValidator]],
-    pais: ['', Validators.required]
+  registerForm = this.fb.group({
+    name: ['', [Validators.required, nameValidator]],
+    document: ['', [Validators.required, documentValidator]],
+    birthDate: ['', [Validators.required, adultValidator]],
+    country: ['', Validators.required]
   });
 
-  constructor(private fb: FormBuilder) { }
+  countries: any[] = [];
 
-  ngOnInit(): void { }
+  constructor(private fb: FormBuilder, private apiService: ApiService) { }
+
+  isControlInvalid(controlName: string): boolean {
+    const control = this.registerForm.get(controlName);
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  isNombreInvalid(): boolean {
+    return this.isControlInvalid('name');
+  }
+
+  isDocumentoInvalid(): boolean {
+    return this.isControlInvalid('document');
+  }
+
+  isFechaNacimientoInvalid(): boolean {
+    return this.isControlInvalid('birthDate');
+  }
+
+  isPaisInvalid(): boolean {
+    return this.isControlInvalid('country');
+  }
+
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  onBlur(controlName: string): void {
+    const control = this.registerForm.get(controlName);
+    if (control) {
+      control.markAsTouched();
+    }
+  }
+
+
+  loadData() {
+    this.apiService.getData().subscribe(data => {
+      this.countries = data;
+    });
+  }
 
   onSubmit() {
-    if (this.registroForm.valid) {
+    if (this.registerForm.valid) {
       alert('Usuario registrado con éxito!');
     }
     else {
@@ -28,29 +69,77 @@ export class RegistroComponent implements OnInit {
   }
 
   getErrorMessage(controlName: string): string {
-    const control = this.registroForm.get(controlName);
+    const control = this.registerForm.get(controlName);
+
     if (control?.hasError('required')) {
       return 'Este campo es requerido.';
-    } else if (control?.hasError('minlength')) {
-      return 'El nombre es demasiado corto.';
-    } else if (control?.hasError('maxlength')) {
-      return 'El nombre es demasiado largo.';
-    } else if (control?.hasError('pattern')) {
-      return 'El formato es incorrecto.';
-    } else if (control?.hasError('menorDeEdad')) {
+    }
+    if (control?.hasError('invalidNameLength')) {
+      return 'El nombre debe tener entre 3 y 20 caracteres.';
+    }
+    if (control?.hasError('invalidNameFormat')) {
+      return 'Formato del nombre no es válido.';
+    }
+    if (control?.hasError('invalidFormat')) {
+      return 'Formato inválido. Solo se permiten números.';
+    }
+    if (control?.hasError('invalidLength')) {
+      return 'El número debe ser de 8 dígitos.';
+    }
+    if (control?.hasError('minor')) {
       return 'Tiene que ser mayor de edad.';
     }
+
     return '';
   }
 }
 
-function mayorDeEdadValidator(control: AbstractControl): { [key: string]: boolean } | null {
-  const fechaNacimiento = new Date(control.value);
-  const fechaActual = new Date();
-  const edad = fechaActual.getFullYear() - fechaNacimiento.getFullYear();
+function nameValidator(control: AbstractControl): { [key: string]: any } | null {
+  const value = control.value;
 
-  if (edad < 18) {
-    return { 'menorDeEdad': true };
+  if (value.length < 3 || value.length > 20) {
+    return { 'invalidNameLength': true };
+  }
+
+  if (!/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/.test(value)) {
+    return { 'invalidNameFormat': true };
+  }
+
+  return null;
+}
+
+function documentValidator(control: AbstractControl): { [key: string]: any } | null {
+  const value = control.value;
+
+  if (!/^[0-9]*$/.test(value)) {
+    return { 'invalidFormat': true };
+  }
+
+  if (value.length !== 8) {
+    return { 'invalidLength': true };
+  }
+
+  return null;
+}
+
+function calculateAge(birthDate: Date, currentDate: Date): number {
+  let age = currentDate.getFullYear() - birthDate.getFullYear();
+  const m = currentDate.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && currentDate.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}
+
+function adultValidator(control: AbstractControl): { [key: string]: boolean } | null {
+  const birthDate = new Date(control.value);
+  const currentDate = new Date();
+  const age = calculateAge(birthDate, currentDate);
+
+  if (age < 18) {
+    return { 'minor': true };
   }
   return null;
 }
