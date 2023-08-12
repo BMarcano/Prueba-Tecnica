@@ -1,6 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { ApiService } from '../service/api.service';
+import { CustomValidators } from './Validators/Validators'
+
+
+type ErrorMessageType = 'required' | 'invalidNameLength' | 'invalidNameFormat' | 'invalidFormat' | 'invalidLength' | 'minor';
+
+const ErrorMessages: Record<ErrorMessageType, string> = {
+  required: "Este campo es requerido.",
+  invalidNameLength: "El nombre debe tener entre 3 y 20 caracteres.",
+  invalidNameFormat: "Formato del nombre no es válido.",
+  invalidFormat: "Formato inválido. Solo se permiten números.",
+  invalidLength: "El número debe ser de 8 dígitos.",
+  minor: "Tiene que ser mayor de edad."
+};
+
 
 @Component({
   selector: 'app-registro',
@@ -9,9 +23,9 @@ import { ApiService } from '../service/api.service';
 })
 export class RegistroComponent implements OnInit {
   registerForm = this.fb.group({
-    name: ['', [Validators.required, nameValidator]],
-    document: ['', [Validators.required, documentValidator]],
-    birthDate: ['', [Validators.required, adultValidator]],
+    name: ['', [Validators.required, CustomValidators.nameValidator]],
+    document: ['', [Validators.required, CustomValidators.documentValidator]],
+    birthDate: ['', [Validators.required, CustomValidators.adultValidator]],
     country: ['', Validators.required]
   });
 
@@ -22,22 +36,6 @@ export class RegistroComponent implements OnInit {
   isControlInvalid(controlName: string): boolean {
     const control = this.registerForm.get(controlName);
     return !!control && control.invalid && (control.dirty || control.touched);
-  }
-
-  isNombreInvalid(): boolean {
-    return this.isControlInvalid('name');
-  }
-
-  isDocumentoInvalid(): boolean {
-    return this.isControlInvalid('document');
-  }
-
-  isFechaNacimientoInvalid(): boolean {
-    return this.isControlInvalid('birthDate');
-  }
-
-  isPaisInvalid(): boolean {
-    return this.isControlInvalid('country');
   }
 
 
@@ -71,75 +69,13 @@ export class RegistroComponent implements OnInit {
   getErrorMessage(controlName: string): string {
     const control = this.registerForm.get(controlName);
 
-    if (control?.hasError('required')) {
-      return 'Este campo es requerido.';
-    }
-    if (control?.hasError('invalidNameLength')) {
-      return 'El nombre debe tener entre 3 y 20 caracteres.';
-    }
-    if (control?.hasError('invalidNameFormat')) {
-      return 'Formato del nombre no es válido.';
-    }
-    if (control?.hasError('invalidFormat')) {
-      return 'Formato inválido. Solo se permiten números.';
-    }
-    if (control?.hasError('invalidLength')) {
-      return 'El número debe ser de 8 dígitos.';
-    }
-    if (control?.hasError('minor')) {
-      return 'Tiene que ser mayor de edad.';
+    if (control?.errors) {
+      const firstErrorKey = Object.keys(control.errors)[0] as ErrorMessageType;
+      return ErrorMessages[firstErrorKey] || '';
     }
 
     return '';
   }
+
 }
 
-function nameValidator(control: AbstractControl): { [key: string]: any } | null {
-  const value = control.value;
-
-  if (value.length < 3 || value.length > 20) {
-    return { 'invalidNameLength': true };
-  }
-
-  if (!/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/.test(value)) {
-    return { 'invalidNameFormat': true };
-  }
-
-  return null;
-}
-
-function documentValidator(control: AbstractControl): { [key: string]: any } | null {
-  const value = control.value;
-
-  if (!/^[0-9]*$/.test(value)) {
-    return { 'invalidFormat': true };
-  }
-
-  if (value.length !== 8) {
-    return { 'invalidLength': true };
-  }
-
-  return null;
-}
-
-function calculateAge(birthDate: Date, currentDate: Date): number {
-  let age = currentDate.getFullYear() - birthDate.getFullYear();
-  const m = currentDate.getMonth() - birthDate.getMonth();
-
-  if (m < 0 || (m === 0 && currentDate.getDate() < birthDate.getDate())) {
-    age--;
-  }
-
-  return age;
-}
-
-function adultValidator(control: AbstractControl): { [key: string]: boolean } | null {
-  const birthDate = new Date(control.value);
-  const currentDate = new Date();
-  const age = calculateAge(birthDate, currentDate);
-
-  if (age < 18) {
-    return { 'minor': true };
-  }
-  return null;
-}

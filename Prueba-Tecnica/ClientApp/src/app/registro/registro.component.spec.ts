@@ -28,51 +28,67 @@ describe('RegistroComponent', () => {
     fixture = TestBed.createComponent(RegistroComponent);
     component = fixture.componentInstance;
     apiService.getData.and.returnValue(of([])); 
-    fixture.detectChanges();
+    fixture.detectChanges();  
   });
 
-  it('name field error message', () => {
+  it('Given the registerForm control name with an empty value, it should display "Este campo es requerido."', () => {
     const name = component.registerForm.controls['name'];
     name.setValue("");
     expect(component.getErrorMessage('name')).toBe('Este campo es requerido.');
+  });
 
+  it('Given the registerForm control name with a value "J@hn", it should display "Formato del nombre no es válido."', () => {
+    const name = component.registerForm.controls['name'];
     name.setValue("J@hn");
     expect(component.getErrorMessage('name')).toBe('Formato del nombre no es válido.');
   });
 
-  it('name field validity', () => {
+
+  it('Given the registerForm control name, when no value is set, it should be invalid.', () => {
     const name = component.registerForm.controls['name'];
     expect(name.valid).toBeFalsy();
+  });
 
+  it('Given the registerForm control name, when set to "John", it should be valid.', () => {
+    const name = component.registerForm.controls['name'];
     name.setValue("John");
     expect(name.valid).toBeTruthy();
   });
 
-  it('document field error message', () => {
+  it('Given the registerForm control document with value "a", it should display "Formato inválido. Solo se permiten números."', () => {
     const document = component.registerForm.controls['document'];
     document.setValue("a");
     expect(component.getErrorMessage('document')).toBe('Formato inválido. Solo se permiten números.');
-
-    document.setValue("1234567")
-    expect(component.getErrorMessage('document')).toBe('El número debe ser de 8 dígitos.');
-
   });
 
-  it('document field validity', () => {
+  it('Given the registerForm control document with value "1234567", it should display "El número debe ser de 8 dígitos."', () => {
+    const document = component.registerForm.controls['document'];
+    document.setValue("1234567");
+    expect(component.getErrorMessage('document')).toBe('El número debe ser de 8 dígitos.');
+  });
+
+
+  it('Given the registerForm control document, when no value is set, it should be invalid.', () => {
     const document = component.registerForm.controls['document'];
     expect(document.valid).toBeFalsy();
+  });
+
+  it('Given the registerForm control document, when set to "12345678", it should be valid.', () => {
+    const document = component.registerForm.controls['document'];
 
     document.setValue("12345678");
     expect(document.valid).toBeTruthy();
   });
 
-  it('birthDate field error message', () => {
+  it('Given the registerForm control birthDate with no value and marked as touched, it should display "Este campo es requerido."', () => {
     const birthDate = component.registerForm.controls['birthDate'];
-
     birthDate.setValue('');
     birthDate.markAsTouched();
     expect(component.getErrorMessage('birthDate')).toBe('Este campo es requerido.');
+  });
 
+  it('Given the registerForm control birthDate with underage year and marked as touched, it should display "Tiene que ser mayor de edad."', () => {
+    const birthDate = component.registerForm.controls['birthDate'];
     const currentDate = new Date();
     const underageYear = currentDate.getFullYear() - 17;
     birthDate.setValue(`${underageYear}-01-01`);
@@ -80,26 +96,31 @@ describe('RegistroComponent', () => {
     expect(component.getErrorMessage('birthDate')).toBe('Tiene que ser mayor de edad.');
   });
 
-  it('birthDate field validity', () => {
+  it('Given the registerForm control birthDate, when no value is set, it should be invalid.', () => {
     const birthDate = component.registerForm.controls['birthDate'];
     expect(birthDate.valid).toBeFalsy();
+  });
 
-    const adultYear = (new Date()).getFullYear() - 18; 
+  it('Given the registerForm control birthDate with adult year, it should be valid.', () => {
+    const birthDate = component.registerForm.controls['birthDate'];
+    const adultYear = (new Date()).getFullYear() - 18;
     birthDate.setValue(`${adultYear}-01-01`);
     expect(birthDate.valid).toBeTruthy();
   });
 
-  it('country field error message', () => {
+  it('Given the registerForm control country with no value, it should display "Este campo es requerido."', () => {
     const country = component.registerForm.controls['country'];
-
     country.setValue('');
     expect(component.getErrorMessage('country')).toBe('Este campo es requerido.');
   });
 
-  it('country field validity', () => {
+  it('Given the registerForm control country, when no value is set, it should be invalid.', () => {
     const country = component.registerForm.controls['country'];
     expect(country.valid).toBeFalsy();
+  });
 
+  it('Given the registerForm control country, when set to "Venezuela", it should be valid.', () => {
+    const country = component.registerForm.controls['country'];
     country.setValue('Venezuela');
     expect(country.valid).toBeTruthy();
   });

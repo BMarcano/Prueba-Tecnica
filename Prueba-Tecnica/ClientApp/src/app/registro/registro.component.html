@@ -3,28 +3,28 @@
     <div class="field">
       <label class="label">Nombre</label>
       <input type="text" class="input" formControlName="name" />
-      <span *ngIf="isNombreInvalid()" class="error">{{ getErrorMessage('name') }}</span>
+      <span *ngIf="isControlInvalid('name')" class="error">{{ getErrorMessage('name') }}</span>
     </div>
 
     <div class="field">
       <label class="label">Documento</label>
       <input type="text" class="input" formControlName="document" (blur)="onBlur('document')" />
-      <span *ngIf="isDocumentoInvalid()" class="error">{{ getErrorMessage('document') }}</span>
+      <span *ngIf="isControlInvalid('document')" class="error">{{ getErrorMessage('document') }}</span>
     </div>
 
     <div class="field">
       <label class="label">Fecha de nacimiento</label>
       <input type="date" class="input" formControlName="birthDate" />
-      <span *ngIf="isFechaNacimientoInvalid()" class="error">{{ getErrorMessage('birthDate') }}</span>
+      <span *ngIf="isControlInvalid('birthDate')" class="error">{{ getErrorMessage('birthDate') }}</span>
     </div>
 
     <div class="field">
       <label class="label">País:</label>
-      <select id="countries" formControlName="country">
+      <select id="countries" class="input" formControlName="country">
         <option value="" disabled selected>Selecciona un país</option>
         <option *ngFor="let country of countries">{{ country.name.common }}</option>
       </select>
-      <span *ngIf="isPaisInvalid()" class="error">{{ getErrorMessage('country') }}</span>
+      <span *ngIf="isControlInvalid('country')" class="error">{{ getErrorMessage('country') }}</span>
     </div>
 
     <button type="submit" class="button">Registrar</button>
